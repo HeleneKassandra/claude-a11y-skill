@@ -1,14 +1,14 @@
 ---
 name: wcag-audit
 description: >
-  Use this skill whenever the user wants to audit, check, review, or scan any HTML, React/JSX, CSS, or code snippet for accessibility issues, WCAG violations, or improvements. Trigger this skill for any of the following: check my code for accessibility, WCAG audit, a11y review, is this accessible, screen reader issues, keyboard navigation problems, color contrast check, ARIA errors, accessibility score, fix my accessibility issues, does this pass WCAG, accessibility compliance, or any question about WCAG guidelines and how to meet them. Also trigger when the user pastes code and asks for a review even if they do not mention accessibility if the code is clearly UI/frontend and accessibility is an obvious concern. Always use this skill for accessibility-related tasks. Never skip it.
+  Use this skill whenever the user wants to audit, check, review, or scan any HTML, React/JSX, CSS, or code snippet for accessibility issues, WCAG violations, or improvements. Trigger this skill for any of the following: check my code for accessibility, WCAG audit, a11y review, is this accessible, screen reader issues, keyboard navigation problems, color contrast check, ARIA errors, accessibility score, fix my accessibility issues, does this pass WCAG, accessibility compliance, or any question about WCAG guidelines and how to meet them. Also trigger when the user pastes code and asks for a review even if they do not mention accessibility if the code is clearly UI/frontend and accessibility is an obvious concern. Always use this skill for accessibility-related tasks.
 ---
 
 # WCAG Accessibility Audit Skill
 
-Conduct structured WCAG 2.1/2.2 accessibility audits on HTML, React/JSX, CSS, and code snippets. Target **Level AA compliance**, and flag small-effort **Level AAA upgrades** where applicable.
+Conduct structured WCAG 2.1/2.2 accessibility audits on HTML, React/JSX, CSS, and code snippets. Target **Level AA compliance**, and flag **Level AAA improvements** where applicable.
 
-> **Primary guidance source:** [Tilsynet for universell utforming av ikt (uutilsynet.no)](https://www.uutilsynet.no/veiledning/losningsforslag-krav/1366) — the Norwegian supervisory authority for universal design of ICT. Their løsningsforslag (solution proposals) cover all 48 WCAG criteria and are the authoritative reference for this skill. Apply their test rules and expected outcomes when auditing, and link to their criterion pages where relevant.
+> **Primary guidance source:** [WCAG 2.1/2.2 documentation](https://www.w3.org/WAI/WCAG22/quickref/) for official definitions and examples.
 
 ---
 
@@ -67,7 +67,7 @@ Issues that make content completely inaccessible to one or more user groups.
 #### [SHORT TITLE] · WCAG [SC number] ([Level])
 **Issue:** What is wrong and why it's a problem.
 **Affects:** Who is impacted (e.g., screen reader users, keyboard-only users).
-**WCAG Success Criterion:** [1.1.1 Non-text Content](https://www.w3.org/WAI/WCAG21/Understanding/non-text-content)
+**WCAG Success Criterion:** [1.1.1 Non-text Content](https://www.w3.org/WAI/WCAG22/quickref/#non-text-content)
 
 **Before (Problematic Code):**
 ```html
@@ -106,11 +106,6 @@ Small effort improvements that would reach Level AAA or polish the experience.
 
 ---
 
-### ✅ What's Already Accessible
-List what the code does correctly. Be specific — name the elements and patterns that pass.
-
----
-
 ### 📋 Quick Fix Checklist
 - [ ] Fix 1 (Critical)
 - [ ] Fix 2 (High)
@@ -132,78 +127,76 @@ List what the code does correctly. Be specific — name the elements and pattern
 
 ## Common Violation Patterns & Fixes
 
-*Code examples sourced from [uutilsynet.no løsningsforslag](https://www.uutilsynet.no/veiledning/losningsforslag-krav/1366)*
+*Code examples based on [WCAG 2.2 Quick Reference](https://www.w3.org/WAI/WCAG22/quickref/)*
 
 ### 4.1.2 — Forms: Name, Role, Value
-uutilsynet: *"Skjemaelementet er koblet til en ledetekst i koden"* (The form element must be connected to a label in the code.)
 
 ```html
 <!-- ❌ No label -->
-<input type="text" name="Fornavn">
+<input type="text" name="first-name">
 
-<!-- ✅ Explicit for/id pairing (uutilsynet recommended) -->
-<label for="Fornavn">Fornavn:</label>
-<input type="text" name="Fornavn" id="Fornavn">
+<!-- ✅ Explicit for/id pairing -->
+<label for="first-name">First name:</label>
+<input type="text" name="first-name" id="first-name">
 
 <!-- ✅ Checkbox with label after -->
-<input type="checkbox" name="abonner" id="abonner">
-<label for="abonner">Abonner på nyhetsbrev</label>
+<input type="checkbox" name="subscribe" id="subscribe">
+<label for="subscribe">Subscribe to newsletter</label>
 
 <!-- ✅ Search field with aria-label -->
-<input type="text" name="søk" aria-label="Søk">
-<button type="submit">Søk</button>
+<input type="text" name="search" aria-label="Search">
+<button type="submit">Search</button>
 
 <!-- ✅ Search field with aria-labelledby -->
-<input type="text" name="søk" aria-labelledby="sokknapp">
-<button id="sokknapp" type="submit">Søk</button>
+<input type="text" name="search" aria-labelledby="search-btn">
+<button id="search-btn" type="submit">Search</button>
 ```
 
 ### 4.1.2 — Grouped Form Fields (fieldset/legend)
-uutilsynet: *"Dersom skjemaelementet hører til en gruppe, er det i tillegg koblet til en ledetekst som gjelder for gruppa."*
 
 ```html
-<!-- ✅ Radio group with fieldset + legend (uutilsynet example) -->
+<!-- ✅ Radio group with fieldset + legend -->
 <fieldset>
-  <legend>Filformat</legend>
+  <legend>File format</legend>
   <div>
-    <input type="radio" name="format" id="tekst" value="txt" checked>
-    <label for="tekst">Tekstfil</label>
+    <input type="radio" name="format" id="text" value="txt" checked>
+    <label for="text">Text file</label>
   </div>
   <div>
     <input type="radio" name="format" id="csv" value="csv">
-    <label for="csv">CSV-fil</label>
+    <label for="csv">CSV file</label>
   </div>
 </fieldset>
 ```
 
 ### 4.1.2 — Buttons
-uutilsynet: *"Knapper som ikke er kodet med standardelementene i (X)HTML, skal ha informasjon om rolle."* Always prefer native elements.
+Always prefer native elements.
 
 ```html
-<!-- ✅ Native button elements (uutilsynet recommended) -->
-<button>Send inn</button>
-<button>Avbryt</button>
-<input type="submit" value="Send inn">
-<input type="button" value="Avbryt">
+<!-- ✅ Native button elements -->
+<button>Submit</button>
+<button>Cancel</button>
+<input type="submit" value="Submit">
+<input type="button" value="Cancel">
 
 <!-- ✅ Icon button with aria-label -->
-<button aria-label="Send inn"><img src="img.png" alt=""></button>
+<button aria-label="Submit"><img src="img.png" alt=""></button>
 ```
 
 ### 4.1.2 — iframes
 ```html
-<!-- ✅ iframe with title (uutilsynet example) -->
-<iframe src="https://www.w3schools.com" title="W3Schools Gratis nettveiledning"></iframe>
+<!-- ✅ iframe with title -->
+<iframe src="https://www.w3schools.com" title="W3Schools Free Web Tutorials"></iframe>
 ```
 
 ### 2.4.7 — Visible Focus
-uutilsynet: *"Alt innhold brukeren kan navigere til med tastatur skal få synlig fokusmarkering."* Acceptable forms include: border, underline, colour change, shadow, or text cursor. The browser default is often insufficient — supplement it with CSS.
+Acceptable forms include: border, underline, colour change, shadow, or text cursor. The browser default is often insufficient — supplement it with CSS.
 
 ```css
 /* ❌ Removes browser default without replacement */
 *:focus { outline: none; }
 
-/* ✅ uutilsynet example: change colour on focus */
+/* ✅ Change colour on focus */
 .clickable {
   color: black;
   background-color: #CCCCCC;
@@ -221,7 +214,7 @@ uutilsynet: *"Alt innhold brukeren kan navigere til med tastatur skal få synlig
 ```
 
 ### 1.4.3 — Contrast (Minimum)
-uutilsynet compliance paths:
+Compliance paths:
 1. Text contrast ≥ 4.5:1 (normal text) or ≥ 3:1 (large/bold text ≥ 24px or ≥ 19px bold)
 2. Provide a high-contrast version with a clearly marked toggle near the top of the page
 
@@ -240,38 +233,37 @@ background: #ffffff;
 ```
 
 ### 1.3.1 — Information and Relationships
-uutilsynet: *"Ting skal være kodet som det ser ut som."* (Things must be coded as they appear.)
 
 ```html
 <!-- ❌ Visual heading not coded as heading -->
-<div class="heading-style">Om oss</div>
+<div class="heading-style">About us</div>
 
 <!-- ✅ Heading coded correctly with right level -->
-<h2>Om oss</h2>
+<h2>About us</h2>
 
 <!-- ❌ Visual list without list semantics -->
-<div>• Punkt en</div>
-<div>• Punkt to</div>
+<div>• Item one</div>
+<div>• Item two</div>
 
 <!-- ✅ Unordered list -->
 <ul>
-  <li>Punkt en</li>
-  <li>Punkt to</li>
+  <li>Item one</li>
+  <li>Item two</li>
 </ul>
 
 <!-- ✅ Data table with caption and th scope -->
 <table>
-  <caption>Månedlig salg</caption>
+  <caption>Monthly sales</caption>
   <thead>
     <tr>
-      <th scope="col">Måned</th>
-      <th scope="col">Salg</th>
+      <th scope="col">Month</th>
+      <th scope="col">Sales</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>Januar</td>
-      <td>120 000 kr</td>
+      <td>January</td>
+      <td>$12,000</td>
     </tr>
   </tbody>
 </table>
@@ -280,7 +272,7 @@ uutilsynet: *"Ting skal være kodet som det ser ut som."* (Things must be coded 
 ### Skip Navigation (2.4.1)
 ```html
 <!-- ✅ Skip link — must be at top of body -->
-<a href="#main-content" class="skip-link">Hopp til hovedinnhold</a>
+<a href="#main-content" class="skip-link">Jump to main content</a>
 
 <style>
 .skip-link {
@@ -387,30 +379,30 @@ Load these only when the topic directly requires the extra detail.
 
 ---
 
-## uutilsynet.no Criterion Pages
+## WCAG 2.2 Quick Reference — Criterion Links
 
-Direct links to the Norwegian supervisory authority's løsningsforslag (solution proposals) for each criterion. Use these as authoritative references when explaining violations or fixes:
+Direct links to the WCAG 2.2 Quick Reference for each criterion. Use these as authoritative references when explaining violations or fixes:
 
 | Criterion | URL |
 |---|---|
-| 1.1.1 Non-text Content | https://www.uutilsynet.no/veiledning/111-ikke-tekstlig-innhold/1231 |
-| 1.3.1 Info and Relationships | https://www.uutilsynet.no/veiledning/131-informasjon-og-relasjoner/1234 |
-| 1.3.5 Input Purpose | https://www.uutilsynet.no/veiledning/135-identifiser-formal-med-inndata/1238 |
-| 1.4.1 Use of Color | https://www.uutilsynet.no/veiledning/141-bruk-av-farge/1239 |
-| 1.4.3 Contrast (Minimum) | https://www.uutilsynet.no/veiledning/143-kontrast-minimum/1245 |
-| 1.4.11 Non-text Contrast | https://www.uutilsynet.no/veiledning/1411-kontrast-ikke-tekstlig-innhold/1241 |
-| 1.4.12 Text Spacing | https://www.uutilsynet.no/veiledning/1412-tekstavstand/1242 |
-| 1.4.13 Hover/Focus Content | https://www.uutilsynet.no/veiledning/1413-pekerfolsomt-innhold-eller-innhold-ved-tastaturfokus/1243 |
-| 2.1.1 Keyboard | https://www.uutilsynet.no/veiledning/211-tastatur/1036 |
-| 2.1.2 No Keyboard Trap | https://www.uutilsynet.no/veiledning/212-ingen-tastaturfelle/1247 |
-| 2.4.1 Bypass Blocks | https://www.uutilsynet.no/veiledning/241-hoppe-over-blokker/1041 |
-| 2.4.2 Page Titled | https://www.uutilsynet.no/veiledning/242-sidetitler/1250 |
-| 2.4.3 Focus Order | https://www.uutilsynet.no/veiledning/243-fokusrekkefolge/1043 |
-| 2.4.4 Link Purpose | https://www.uutilsynet.no/veiledning/244-formal-med-lenke-i-kontekst/1251 |
-| 2.4.7 Visible Focus | https://www.uutilsynet.no/veiledning/247-synlig-fokus/1047 |
-| 3.1.1 Language of Page | https://www.uutilsynet.no/veiledning/311-sprak-pa-siden/1258 |
-| 3.3.1 Error Identification | https://www.uutilsynet.no/veiledning/331-identifikasjon-av-feil/1262 |
-| 3.3.2 Labels or Instructions | https://www.uutilsynet.no/veiledning/332-ledetekster-eller-instruksjoner/1263 |
-| 3.3.3 Error Suggestion | https://www.uutilsynet.no/veiledning/333-forslag-ved-feil/1264 |
-| 4.1.2 Name, Role, Value | https://www.uutilsynet.no/veiledning/412-navn-rolle-verdi/1267 |
-| 4.1.3 Status Messages | https://www.uutilsynet.no/veiledning/413-statusbeskjeder/1268 |
+| 1.1.1 Non-text Content | https://www.w3.org/WAI/WCAG22/quickref/#non-text-content |
+| 1.3.1 Info and Relationships | https://www.w3.org/WAI/WCAG22/quickref/#info-and-relationships |
+| 1.3.5 Input Purpose | https://www.w3.org/WAI/WCAG22/quickref/#identify-input-purpose |
+| 1.4.1 Use of Color | https://www.w3.org/WAI/WCAG22/quickref/#use-of-color |
+| 1.4.3 Contrast (Minimum) | https://www.w3.org/WAI/WCAG22/quickref/#contrast-minimum |
+| 1.4.11 Non-text Contrast | https://www.w3.org/WAI/WCAG22/quickref/#non-text-contrast |
+| 1.4.12 Text Spacing | https://www.w3.org/WAI/WCAG22/quickref/#text-spacing |
+| 1.4.13 Hover/Focus Content | https://www.w3.org/WAI/WCAG22/quickref/#content-on-hover-or-focus |
+| 2.1.1 Keyboard | https://www.w3.org/WAI/WCAG22/quickref/#keyboard |
+| 2.1.2 No Keyboard Trap | https://www.w3.org/WAI/WCAG22/quickref/#no-keyboard-trap |
+| 2.4.1 Bypass Blocks | https://www.w3.org/WAI/WCAG22/quickref/#bypass-blocks |
+| 2.4.2 Page Titled | https://www.w3.org/WAI/WCAG22/quickref/#page-titled |
+| 2.4.3 Focus Order | https://www.w3.org/WAI/WCAG22/quickref/#focus-order |
+| 2.4.4 Link Purpose | https://www.w3.org/WAI/WCAG22/quickref/#link-purpose-in-context |
+| 2.4.7 Visible Focus | https://www.w3.org/WAI/WCAG22/quickref/#focus-visible |
+| 3.1.1 Language of Page | https://www.w3.org/WAI/WCAG22/quickref/#language-of-page |
+| 3.3.1 Error Identification | https://www.w3.org/WAI/WCAG22/quickref/#error-identification |
+| 3.3.2 Labels or Instructions | https://www.w3.org/WAI/WCAG22/quickref/#labels-or-instructions |
+| 3.3.3 Error Suggestion | https://www.w3.org/WAI/WCAG22/quickref/#error-suggestion |
+| 4.1.2 Name, Role, Value | https://www.w3.org/WAI/WCAG22/quickref/#name-role-value |
+| 4.1.3 Status Messages | https://www.w3.org/WAI/WCAG22/quickref/#status-messages |
