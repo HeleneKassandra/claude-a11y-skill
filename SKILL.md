@@ -224,6 +224,12 @@ Prefer native HTML5 elements over ARIA-enhanced divs/spans. Native elements prov
 <!-- ✅ Link for navigation, button for actions -->
 <a href="/about">About us</a>
 <button type="button" onclick="submitForm()">Submit</button>
+
+<!-- ❌ Div used for role="status" aria-live="polite" -->
+<div role="status" aria-live="polite">Loading...</div>
+
+<!-- ✅ Output element sets role="status", aria-live="polite" and aria-atomic="true" automatically -->
+<output>Loading..</output>
 ```
 
 ### 4.1.2 — iframes
