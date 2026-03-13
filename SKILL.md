@@ -363,34 +363,7 @@ background: #ffffff;
 ---
 
 ## React/JSX Specific Checks
-Read the file `resources/react-a11y-patterns.md` for React-specific patterns related to modals, dynamic lists and focus management.
-
-When auditing React components, also verify:
-- **`key` props** don't use index when list is reorderable (can disrupt screen reader order)
-- **`onClick` on non-interactive elements** → replace with `<button>` or add `role`, `tabIndex`, `onKeyDown`
-- **Dynamic content updates** → use `aria-live` regions or focus management after async operations
-- **Images via JSX** → `alt` prop always required (empty string `""` for decorative)
-- **Custom hooks** managing focus → ensure `useEffect` restores focus after modal/dialog closes
-- **Fragment usage** → don't wrap `<label>` and `<input>` in ways that break association
-- **Native elements** → prefer `<button>`, `<a>`, `<nav>`, `<main>`, `<dialog>`, `<details>` etc. over custom elements with ARIA roles; native elements provide keyboard behavior and semantics without extra wiring
-
-```jsx
-// ❌ onClick on div — not keyboard accessible
-<div onClick={handleClick}>Open Menu</div>
-
-// ✅ Proper button with ARIA
-<button
-  type="button"
-  onClick={handleClick}
-  aria-expanded={isOpen}
-  aria-controls="menu-list"
->
-  Open Menu
-</button>
-<div id="menu-list">
-   menu content
-</div>
-```
+Read the file `resources/react-a11y-patterns.md` for React-specific pattern examples, but also apply all the general WCAG checks to the rendered output of React components.
 
 ---
 

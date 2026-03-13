@@ -1,4 +1,5 @@
 # React Accessibility Patterns
+- **`key` props** don't use index when list is reorderable (can disrupt screen reader order)
 
 ## Modal / Dialog with Focus Trap
 The `<dialog>` element provides a native modal experience with built-in focus management and keyboard handling, so suggest using the native element when possible for better accessibility and less custom code.
@@ -216,7 +217,7 @@ function AccessibleForm() {
       </div>
 
       {submitted && (
-        <output>
+        <output role="status">
           ✅ Form submitted successfully!
         </output>
       )}
