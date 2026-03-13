@@ -228,8 +228,8 @@ Prefer native HTML5 elements over ARIA-enhanced divs/spans. Native elements prov
 <!-- ❌ Div used for role="status" aria-live="polite" -->
 <div role="status" aria-live="polite">Loading...</div>
 
-<!-- ✅ Output element sets role="status", aria-live="polite" and aria-atomic="true" automatically -->
-<output>Loading..</output>
+<!-- ✅ Output element sets aria-live="polite" and aria-atomic="true" automatically. It's supposed to also set role="status" but some screen readers have been found not to announce it without it being set explicitly-->
+<output role="status">Loading..</output>
 ```
 
 ### 4.1.2 — iframes
