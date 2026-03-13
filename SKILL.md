@@ -22,7 +22,6 @@ Determine what you're auditing:
 - **WCAG question** → answer directly, citing the relevant success criterion
 
 ### Step 2 — Scan All WCAG Domains
-
 Check every domain below. Do **not** skip a domain because it seems irrelevant — scan and confirm no issues before moving on.
 
 | Domain | What to Check |
@@ -47,8 +46,7 @@ Structure all output using the report format below. Always group by severity (Cr
 ---
 
 ## Report Format
-
-```
+Reply by using this following format:
 ## ♿ Accessibility Audit Report
 
 ### Summary
@@ -110,7 +108,6 @@ Small effort improvements that would reach Level AAA or polish the experience.
 - [ ] Fix 1 (Critical)
 - [ ] Fix 2 (High)
 - [ ] Fix 3 (Medium)
-```
 
 ---
 
@@ -314,9 +311,9 @@ background: #ffffff;
 ---
 
 ## React/JSX Specific Checks
+Read the file `resources/react-a11y-patterns.md` for React-specific patterns related to modals, dynamic lists and focus management.
 
 When auditing React components, also verify:
-
 - **`key` props** don't use index when list is reorderable (can disrupt screen reader order)
 - **`onClick` on non-interactive elements** → replace with `<button>` or add `role`, `tabIndex`, `onKeyDown`
 - **Dynamic content updates** → use `aria-live` regions or focus management after async operations
@@ -337,6 +334,9 @@ When auditing React components, also verify:
 >
   Open Menu
 </button>
+<div id="menu-list">
+   menu content
+</div>
 ```
 
 ---

@@ -1,63 +1,47 @@
 # React Accessibility Patterns
 
 ## Modal / Dialog with Focus Trap
+The `<dialog>` element provides a native modal experience with built-in focus management and keyboard handling, so suggest using the native element when possible for better accessibility and less custom code.
+On open (`showModal()`), it traps focus and prevents interaction with the background content, along with focusing the first focusable element inside the dialog.
+This default behavior can be overwritten by adding `autofocus` to a specific element inside the dialog.
+
+On close (`close()`), it restores focus to the previously focused element.
 
 ```jsx
 import { useEffect, useRef } from "react";
 
 function Modal({ isOpen, onClose, title, children }) {
   const dialogRef = useRef(null);
-  const previousFocusRef = useRef(null);
 
   useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
     if (isOpen) {
-      previousFocusRef.current = document.activeElement;
-      dialogRef.current?.focus();
+      dialog.showModal();
     } else {
-      previousFocusRef.current?.focus();
+      dialog.close();
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "Tab") trapFocus(e, dialogRef.current);
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
+  // Sync React state when the browser closes the dialog via Escape
+  const handleCancel = (e) => {
+    e.preventDefault();
+    onClose();
+  };
 
   return (
-    <div role="presentation" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)" }}>
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-title"
-        ref={dialogRef}
-        tabIndex={-1}
-        style={{ background: "#fff", padding: "2rem", borderRadius: "8px", maxWidth: "500px", margin: "10vh auto" }}
-      >
-        <h2 id="modal-title">{title}</h2>
-        {children}
-        <button type="button" onClick={onClose}>Close</button>
-      </div>
-    </div>
+    // Style the native backdrop via the ::backdrop CSS pseudo-element
+    <dialog
+      ref={dialogRef}
+      aria-labelledby="modal-title"
+      onCancel={handleCancel}
+      style={{ borderRadius: "8px", maxWidth: "500px", padding: "2rem" }}
+    >
+      <h2 id="modal-title">{title}</h2>
+      {children}
+      <button type="button" onClick={onClose}>Close</button>
+    </dialog>
   );
-}
-
-function trapFocus(e, container) {
-  const focusable = container.querySelectorAll(
-    'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
-  );
-  const first = focusable[0];
-  const last = focusable[focusable.length - 1];
-  if (e.shiftKey ? document.activeElement === first : document.activeElement === last) {
-    e.preventDefault();
-    (e.shiftKey ? last : first).focus();
-  }
 }
 ```
 
@@ -120,110 +104,66 @@ function Tabs({ tabs }) {
 }
 ```
 
-## Accessible Dropdown Menu
+## Accessible Accordion
 
+### With ARIA roles and JavaScript (more control but more complex):
+This approach requires managing ARIA attributes (`aria-expanded`, `aria-controls`) and keyboard interactions manually to ensure accessibility.
+You need to handle focus management and state updates to reflect the open/closed state of each accordion section, and ensure that assistive technologies are properly informed of state changes.
 ```jsx
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 
-function DropdownMenu({ label, items }) {
-  const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const buttonRef = useRef(null);
-  const menuRef = useRef(null);
-
-  useEffect(() => {
-    if (!open) { setActiveIndex(-1); return; }
-    menuRef.current?.querySelector('[role="menuitem"]')?.focus();
-  }, [open]);
-
-  const handleButtonKeyDown = (e) => {
-    if (["Enter", " ", "ArrowDown"].includes(e.key)) { e.preventDefault(); setOpen(true); }
-    if (e.key === "ArrowUp") { e.preventDefault(); setOpen(true); setActiveIndex(items.length - 1); }
-  };
-
-  const handleMenuKeyDown = (e) => {
-    const items_els = [...menuRef.current.querySelectorAll('[role="menuitem"]')];
-    let next = activeIndex;
-    if (e.key === "ArrowDown") next = (activeIndex + 1) % items_els.length;
-    if (e.key === "ArrowUp") next = (activeIndex - 1 + items_els.length) % items_els.length;
-    if (e.key === "Home") next = 0;
-    if (e.key === "End") next = items_els.length - 1;
-    if (e.key === "Escape") { setOpen(false); buttonRef.current?.focus(); return; }
-    if (e.key === "Tab") { setOpen(false); return; }
-    if (next !== activeIndex) { e.preventDefault(); setActiveIndex(next); items_els[next]?.focus(); }
-  };
+function Accordion({ items }) {
+  const [openId, setOpenId] = useState(null);
 
   return (
-    <div style={{ position: "relative", display: "inline-block" }}>
-      <button
-        ref={buttonRef}
-        type="button"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-        onKeyDown={handleButtonKeyDown}
-      >
-        {label}
-      </button>
-      {open && (
-        <ul
-          role="menu"
-          ref={menuRef}
-          onKeyDown={handleMenuKeyDown}
-          style={{ position: "absolute", listStyle: "none", padding: 0, margin: 0, background: "#fff", border: "1px solid #ccc" }}
-        >
-          {items.map((item, i) => (
-            <li key={item.id} role="none">
+    <div>
+      {items.map((item) => {
+        const isOpen = openId === item.id;
+        const panelId = `panel-${item.id}`;
+        const buttonId = `button-${item.id}`;
+        return (
+          <div key={item.id}>
+            <h3>
               <button
-                role="menuitem"
-                tabIndex={-1}
-                onClick={() => { item.onClick(); setOpen(false); buttonRef.current?.focus(); }}
+                id={buttonId}
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                onClick={() => setOpenId(isOpen ? null : item.id)}
               >
-                {item.label}
+                {item.heading}
               </button>
-            </li>
-          ))}
-        </ul>
-      )}
+            </h3>
+            <div
+              id={panelId}
+              aria-labelledby={buttonId}
+              role="region"
+            >
+              {item.content}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 ```
 
-## Live Region / Status Announcer Hook
-
+### With native `<details>` element (recommended for simplicity and accessibility):
+The native `<details>` element provides a simple way to create an accessible accordion without needing to manage ARIA attributes or keyboard interactions manually.
+The open/close state is handled by the browser, and it automatically announces state changes to assistive technologies.
+The state can be programmatically controlled via the `open` attribute and `onToggle` event.
 ```jsx
-import { useEffect, useRef } from "react";
 
-// Reusable hook for screen reader announcements
-function useAnnouncer() {
-  const ref = useRef(null);
-  const announce = (message, priority = "polite") => {
-    if (!ref.current) return;
-    ref.current.setAttribute("aria-live", priority);
-    ref.current.textContent = "";
-    // Timeout forces screen readers to re-announce identical messages
-    setTimeout(() => { ref.current.textContent = message; }, 50);
-  };
-  return { ref, announce };
-}
-
-// Usage in a component
-function SearchResults({ results, loading }) {
-  const { ref, announce } = useAnnouncer();
-
-  useEffect(() => {
-    if (loading) announce("Loading results...");
-    else announce(`${results.length} results found`);
-  }, [loading, results.length]);
-
+function Accordion() {
   return (
-    <>
-      {/* Visually hidden live region */}
-      <div ref={ref} className="sr-only" aria-live="polite" aria-atomic="true" />
-      {/* Visual results */}
-      {results.map((r) => <div key={r.id}>{r.title}</div>)}
-    </>
+        <details
+          key={item.id}
+          open={openId === item.id}
+          onToggle={(e) => setOpenId(e.target.open ? item.id : null)}
+        >
+          <summary>Title</summary>
+          Content of the section goes here.
+        </details>
   );
 }
 ```
@@ -276,59 +216,13 @@ function AccessibleForm() {
       </div>
 
       {submitted && (
-        <div role="status" aria-live="polite">
+        <output>
           ✅ Form submitted successfully!
-        </div>
+        </output>
       )}
 
       <button type="submit">Subscribe</button>
     </form>
-  );
-}
-```
-
-## Route Change Announcements (React Router)
-
-```jsx
-import { useEffect, useRef } from "react";
-import { useLocation } from "react-router-dom";
-
-function RouteAnnouncer() {
-  const location = useLocation();
-  const ref = useRef(null);
-
-  useEffect(() => {
-    // Announce page change to screen readers
-    const pageTitle = document.title || location.pathname;
-    if (ref.current) {
-      ref.current.textContent = `Navigated to ${pageTitle}`;
-    }
-    // Move focus to main content area
-    const main = document.getElementById("main-content");
-    main?.focus();
-  }, [location]);
-
-  return (
-    <div
-      ref={ref}
-      aria-live="assertive"
-      aria-atomic="true"
-      className="sr-only"
-    />
-  );
-}
-
-// In your app layout:
-function AppLayout({ children }) {
-  return (
-    <>
-      <RouteAnnouncer />
-      <a href="#main-content" className="skip-link">Skip to main content</a>
-      <header>...</header>
-      <main id="main-content" tabIndex={-1}>
-        {children}
-      </main>
-    </>
   );
 }
 ```
