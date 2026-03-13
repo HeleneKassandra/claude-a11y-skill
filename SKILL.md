@@ -5,7 +5,6 @@ description: >
 ---
 
 # WCAG Accessibility Audit Skill
-
 Conduct structured WCAG 2.1/2.2 accessibility audits on HTML, React/JSX, CSS, and code snippets. Target **Level AA compliance**, and flag **Level AAA improvements** where applicable.
 
 > **Primary guidance source:** [WCAG 2.1/2.2 documentation](https://www.w3.org/WAI/WCAG22/quickref/) for official definitions and examples.
@@ -26,7 +25,7 @@ Check every domain below. Do **not** skip a domain because it seems irrelevant �
 
 | Domain | What to Check |
 |---|---|
-| Semantic HTML | Correct element usage, heading hierarchy, landmark regions |
+| Semantic HTML | Correct element usage, heading hierarchy, landmark regions; prefer native HTML5 elements over ARIA-enhanced divs/spans |
 | ARIA | Valid roles, required properties, no redundant or conflicting ARIA |
 | Keyboard Navigation | Focusable elements, logical tab order, no keyboard traps |
 | Focus Visibility | Visible focus indicators on all interactive elements |
@@ -40,7 +39,6 @@ Check every domain below. Do **not** skip a domain because it seems irrelevant �
 | Dynamic Content | Route change announcements, loading states, modals/dialogs |
 
 ### Step 3 — Format the Report
-
 Structure all output using the report format below. Always group by severity (Critical → Minor). Always include the fixed code snippet for every violation found.
 
 ---
@@ -178,6 +176,54 @@ Always prefer native elements.
 
 <!-- ✅ Icon button with aria-label -->
 <button aria-label="Submit"><img src="img.png" alt=""></button>
+```
+
+### Native HTML5 Elements
+Prefer native HTML5 elements over ARIA-enhanced divs/spans. Native elements provide built-in semantics, keyboard behavior, and focus management for free — ARIA roles only add semantics without the behavior.
+
+```html
+<!-- ❌ ARIA-enhanced divs for landmark regions -->
+<div role="navigation">...</div>
+<div role="main">...</div>
+<div role="banner">...</div>
+<div role="contentinfo">...</div>
+<div role="complementary">...</div>
+
+<!-- ✅ Native landmark elements -->
+<nav>...</nav>
+<main>...</main>
+<header>...</header>
+<footer>...</footer>
+<aside>...</aside>
+
+<!-- ❌ Custom accordion with ARIA -->
+<div role="button" aria-expanded="false" tabindex="0">Section title</div>
+<div role="region" hidden>Section content</div>
+
+<!-- ✅ Native details/summary accordion -->
+<details>
+  <summary>Section title</summary>
+  <p>Section content</p>
+</details>
+
+<!-- ❌ Custom modal with ARIA role -->
+<div role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
+  <h2 id="modal-title">Confirm action</h2>
+  ...
+</div>
+
+<!-- ✅ Native dialog element (built-in focus trap and accessibility) -->
+<dialog aria-labelledby="modal-title">
+  <h2 id="modal-title">Confirm action</h2>
+  ...
+</dialog>
+
+<!-- ❌ Button used for navigation -->
+<button onclick="window.location='/about'">About us</button>
+
+<!-- ✅ Link for navigation, button for actions -->
+<a href="/about">About us</a>
+<button type="button" onclick="submitForm()">Submit</button>
 ```
 
 ### 4.1.2 — iframes
@@ -320,6 +366,7 @@ When auditing React components, also verify:
 - **Images via JSX** → `alt` prop always required (empty string `""` for decorative)
 - **Custom hooks** managing focus → ensure `useEffect` restores focus after modal/dialog closes
 - **Fragment usage** → don't wrap `<label>` and `<input>` in ways that break association
+- **Native elements** → prefer `<button>`, `<a>`, `<nav>`, `<main>`, `<dialog>`, `<details>` etc. over custom elements with ARIA roles; native elements provide keyboard behavior and semantics without extra wiring
 
 ```jsx
 // ❌ onClick on div — not keyboard accessible
@@ -380,8 +427,8 @@ Load these only when the topic directly requires the extra detail.
 ---
 
 ## WCAG 2.2 Quick Reference — Criterion Links
+See  `resources/wcag-criteria-reference.md` for a comprehensive list of all criteria, and use the following direct links to the WCAG 2.2 Quick Reference for each criterion if additional information is necessary.
 
-Direct links to the WCAG 2.2 Quick Reference for each criterion. Use these as authoritative references when explaining violations or fixes:
 
 | Criterion | URL |
 |---|---|
